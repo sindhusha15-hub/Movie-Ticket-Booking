@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Cineverse | Movie Ticket Booking & Reviews{% endblock %}</title>
+    <meta name="description" content="Discover movies, check showtimes, choose your seats in real-time, and read community reviews on Cineverse.">
+
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Custom Cinema Stylesheet -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-cinema sticky-top">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="{% url 'movie_list' %}" id="navBrand">
+                <i class="bi bi-film text-warning"></i>
+                <span>CINEVERSE</span>
+            </a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'movie_list' and not request.GET.genre %}active{% endif %}" href="{% url 'movie_list' %}" id="navMovies">
+                            <i class="bi bi-camera-reels me-1"></i>Now Showing
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'booking_lookup' %}active{% endif %}" href="{% url 'booking_lookup' %}" id="navLookup">
+                            <i class="bi bi-ticket-perforated me-1"></i>My Bookings
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Search Bar -->
+                <form class="d-flex me-lg-3 my-2 my-lg-0" method="GET" action="{% url 'movie_list' %}" role="search">
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-secondary">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input class="form-control bg-dark text-white border-secondary" type="search" name="q" placeholder="Search movies or genre..." value="{{ query|default:'' }}" aria-label="Search" id="globalSearchInput">
+                        <button class="btn btn-warning fw-semibold" type="submit" id="globalSearchBtn">Search</button>
+                    </div>
+                </form>
+
+                <div class="d-flex align-items-center gap-2">
+                    <a href="/admin/" target="_blank" class="btn btn-sm btn-outline-secondary" title="Django Admin Dashboard" id="navAdminBtn">
+                        <i class="bi bi-shield-lock me-1"></i>Admin
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Django Messages Alerts -->
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% else %}info{% endif %} alert-dismissible fade show cinema-card text-white py-3 px-4 shadow-sm" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="bi {% if message.tags == 'error' %}bi-exclamation-octagon-fill text-danger{% elif message.tags == 'success' %}bi-check-circle-fill text-success{% else %}bi-info-circle-fill text-info{% endif %} fs-4 me-3"></i>
+                        <div>{{ message }}</div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Global Cinema Toast -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+        <div id="cinemaToast" class="toast align-items-center text-bg-dark border-warning" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="cinemaToastBody">
+                    Notification message
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-4 mt-5">
+        <div class="container text-center">
+            <div class="row align-items-center justify-content-between gy-3">
+                <div class="col-md-4 text-md-start">
+                    <div class="brand-logo fs-5 mb-1">
+                        <i class="bi bi-film text-warning"></i> CINEVERSE
+                    </div>
+                    <p class="small text-muted mb-0">Cinema Ticket Booking & Community Review Portal</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <span class="badge bg-dark border border-secondary text-secondary px-3 py-2">
+                        <i class="bi bi-cpu me-1"></i> Django 6.x • SQLite • WhiteNoise • Gunicorn
+                    </span>
+                </div>
+                <div class="col-md-4 text-md-end text-muted small">
+                    <span>Capstone Student Project &copy; 2026. All rights reserved.</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
